@@ -1,0 +1,167 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Room {
+    private int roomNumber;
+    private String type; // Single, Double, Suite
+    private boolean isAvailable;
+    private double price;
+
+    // Constructor
+    public Room(int roomNumber, String type, double price) {
+        this.roomNumber = roomNumber;
+        this.type = type;
+        this.isAvailable = true; // Initially all rooms are available
+        this.price = price;
+    }
+
+    // Getters and Setters
+    public int getRoomNumber() {
+        return roomNumber;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
+
+    @Override
+    public String toString() {
+        return "Room " + roomNumber + " (" + type + "): $" + price + " per night - " + (isAvailable ? "Available" : "Booked");
+    }
+}
+
+class Reservation {
+    private Room room;
+    private String customerName;
+    private int nights;
+    private double totalCost;
+
+    // Constructor
+    public Reservation(Room room, String customerName, int nights) {
+        this.room = room;
+        this.customerName = customerName;
+        this.nights = nights;
+        this.totalCost = room.getPrice() * nights;
+    }
+
+    // Method to display reservation details
+    public void displayBookingDetails() {
+        System.out.println("Booking Details:");
+        System.out.println("Customer: " + customerName);
+        System.out.println("Room Number: " + room.getRoomNumber() + " (" + room.getType() + ")");
+        System.out.println("Nights: " + nights);
+        System.out.println("Total Cost: $" + totalCost);
+    }
+}
+
+public class HotelReservationSystem {
+    private static ArrayList<Room> rooms = new ArrayList<>();
+    private static ArrayList<Reservation> reservations = new ArrayList<>();
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        initializeRooms();
+        int choice;
+        do {
+            System.out.println("\nWelcome to the Hotel Reservation System");
+            System.out.println("1. View Available Rooms");
+            System.out.println("2. Make a Reservation");
+            System.out.println("3. View Reservation Details");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    viewAvailableRooms();
+                    break;
+                case 2:
+                    makeReservation();
+                    break;
+                case 3:
+                    viewReservationDetails();
+                    break;
+                case 4:
+                    System.out.println("Exiting the system. Thank you!");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        } while (choice != 4);
+    }
+
+    // Initialize the list of rooms
+    public static void initializeRooms() {
+        rooms.add(new Room(101, "Single", 100.00));
+        rooms.add(new Room(102, "Double", 150.00));
+        rooms.add(new Room(103, "Suite", 250.00));
+        rooms.add(new Room(104, "Single", 100.00));
+        rooms.add(new Room(105, "Double", 150.00));
+    }
+
+    // View available rooms
+    public static void viewAvailableRooms() {
+        System.out.println("\nAvailable Rooms:");
+        for (Room room : rooms) {
+            if (room.isAvailable()) {
+                System.out.println(room);
+            }
+        }
+    }
+
+    // Make a reservation
+    public static void makeReservation() {
+        System.out.print("Enter your name: ");
+        String customerName = scanner.next();
+
+        System.out.print("Enter number of nights: ");
+        int nights = scanner.nextInt();
+
+        System.out.println("Available rooms:");
+        viewAvailableRooms();
+        System.out.print("Enter room number to reserve: ");
+        int roomNumber = scanner.nextInt();
+
+        Room selectedRoom = null;
+        for (Room room : rooms) {
+            if (room.getRoomNumber() == roomNumber && room.isAvailable()) {
+                selectedRoom = room;
+                break;
+            }
+        }
+
+        if (selectedRoom != null) {
+            Reservation reservation = new Reservation(selectedRoom, customerName, nights);
+            reservations.add(reservation);
+            selectedRoom.setAvailable(false); // Mark room as booked
+            System.out.println("Reservation successful!");
+            System.out.println("Please make payment of $" + selectedRoom.getPrice() * nights + " at the front desk.");
+        } else {
+            System.out.println("Sorry, the selected room is not available.");
+        }
+    }
+
+    // View reservation details
+    public static void viewReservationDetails() {
+        if (reservations.isEmpty()) {
+            System.out.println("No reservations found.");
+        } else {
+            System.out.println("\nYour Reservation Details:");
+            for (Reservation reservation : reservations) {
+                reservation.displayBookingDetails();
+            }
+        }
+    }
+}
